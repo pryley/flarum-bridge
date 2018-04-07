@@ -30,3 +30,18 @@ $app = (new GeminiLabs\FlarumBridge\Application)->init();
 function glfb() {
 	return GeminiLabs\FlarumBridge\Application::load();
 }
+
+/**
+ * @return array
+ */
+add_filter( 'flarum-bridge/log-levels', function( $constants ) {
+	// unset( $constants['ALERT'] );
+	// unset( $constants['CRITICAL'] );
+	unset( $constants['DEBUG'] );
+	// unset( $constants['EMERGENCY'] );
+	// unset( $constants['ERROR'] );
+	// unset( $constants['INFO'] );
+	// unset( $constants['NOTICE'] );
+	// unset( $constants['WARNING'] );
+	return $constants;
+});

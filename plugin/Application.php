@@ -3,6 +3,9 @@
 namespace GeminiLabs\FlarumBridge;
 
 use GeminiLabs\FlarumBridge\Container;
+use GeminiLabs\FlarumBridge\Database;
+use GeminiLabs\FlarumBridge\Flarum;
+use GeminiLabs\FlarumBridge\Log;
 
 final class Application extends Container
 {
@@ -12,6 +15,7 @@ final class Application extends Container
 	public $file;
 	public $flarum;
 	public $languages;
+	public $log;
 	public $name;
 	public $version;
 
@@ -38,9 +42,15 @@ final class Application extends Container
 	public function bootstrap()
 	{
 		$this->singleton( Database::class, Database::class );
-		$this->singleton( Flarum::class, Flarum::class );
 		$this->db = $this->make( Database::class );
+		$this->bind( Flarum::class, function() {
+			return new Flarum( $this->db->getsettings() );
+		});
 		$this->flarum = $this->make( Flarum::class );
+		$this->bind( Log::class, function() {
+			return new Log( trailingslashit( WP_CONTENT_DIR ).'flarum-bridge.log' );
+		});
+		$this->log = $this->make( Log::class );
 	}
 
 	/**
