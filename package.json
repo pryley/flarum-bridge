@@ -1,0 +1,17 @@
+{
+  "private": true,
+  "devDependencies": {
+    "gulp": "^3.9.1",
+    "gulp-bump": "^3.1.0",
+    "gulp-checktextdomain": "^2.1.1",
+    "gulp-potomo": "^1.0.3",
+    "gulp-pseudo-i18n": "^0.2.1",
+    "gulp-rename": "^1.2.2",
+    "gulp-sort": "^2.0.0",
+    "gulp-wp-pot": "^2.2.0",
+    "pump": "^3.0.0",
+    "run-sequence": "^2.2.1",
+    "yamljs": "^0.3.0",
+    "yargs": "^11.1.0"
+  }
+}

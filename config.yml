@@ -1,0 +1,14 @@
+bump:
+  stable tag: readme.txt
+  version: flarum-bridge.php
+dest:
+  lang: languages/
+language:
+  domain: flarum-bridge
+  team: Gemini Labs <support@geminilabs.io>
+  translator: Paul Ryley <paul@geminilabs.io>
+watch:
+  php:
+    - plugin/**/*.php
+    - views/**/*.php
+    - '*.php'
