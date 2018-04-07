@@ -22,4 +22,11 @@ require_once __DIR__.'/autoload.php';
 
 if( GL_Activate::shouldDeactivate( __FILE__ ))return;
 
-$app = (new GeminiLabs\FlarumBridge\Application( realpath( __FILE__ )))->init();
+$app = (new GeminiLabs\FlarumBridge\Application)->init();
+
+/**
+ * @return GeminiLabs\FlarumBridge\Application
+ */
+function glfb() {
+	return GeminiLabs\FlarumBridge\Application::load();
+}

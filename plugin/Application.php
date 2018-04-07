@@ -2,24 +2,26 @@
 
 namespace GeminiLabs\FlarumBridge;
 
-class Application
+use GeminiLabs\FlarumBridge\Container;
+
+final class Application extends Container
 {
+	const ID = 'flarum-bridge';
+
 	public $file;
-	public $id;
+	public $flarum;
 	public $languages;
 	public $name;
 	public $version;
 
-	protected $flarum;
-
 	/**
-	 * @param string $file
 	 * @return void
 	 */
-	public function __construct( $file )
+	public function __construct()
 	{
-		$plugin = get_file_data( $file, [
-			'id' => 'Text Domain',
+		$this->bootstrap();
+		$this->file = trailingslashit( dirname( __DIR__ )).static::ID.'.php';
+		$plugin = get_file_data( $this->file, [
 			'languages' => 'Domain Path',
 			'name' => 'Plugin Name',
 			'version' => 'Version',
@@ -27,8 +29,15 @@ class Application
 		array_walk( $plugin, function( $value, $key ) {
 			$this->$key = $value;
 		});
-		$this->file = $file;
-		$this->flarum = new Flarum( $this->getSettings() );
+	}
+
+	/**
+	 * @return void
+	 */
+	public function bootstrap()
+	{
+		$this->singleton( Flarum::class, Flarum::class );
+		$this->flarum = $this->make( Flarum::class );
 	}
 
 	/**
@@ -63,12 +72,13 @@ class Application
 	 */
 	public function init()
 	{
-		add_action( 'admin_menu',     [$this, 'registerMenu'] );
-		add_action( 'admin_menu',     [$this, 'registerSettings'] );
-		add_action( 'plugins_loaded', [$this, 'registerLanguages'] );
-		add_action( 'wp_logout',      [$this->flarum, 'logoutUser'] );
-		add_filter( 'authenticate',   [$this->flarum, 'loginUser'], 999, 3 );
-		add_filter( 'login_redirect', [$this->flarum, 'redirectUser'], 10, 3 );
+		add_action( 'admin_menu',           [$this, 'registerMenu'] );
+		add_action( 'admin_menu',           [$this, 'registerSettings'] );
+		add_action( 'plugins_loaded',       [$this, 'registerLanguages'] );
+		add_filter( 'authenticate',         [$this->flarum, 'loginUser'], 999, 3 );
+		add_action( 'wp_logout',            [$this->flarum, 'logoutUser'] );
+		add_filter( 'login_redirect',       [$this->flarum, 'redirectUser'], 10, 3 );
+		add_action( 'after_password_reset', [$this->flarum, 'updateUserPassword'], 10, 2 );
 	}
 
 	/**
@@ -85,7 +95,7 @@ class Application
 	 */
 	public function registerLanguages()
 	{
-		load_plugin_textdomain( $this->id, false,
+		load_plugin_textdomain( static::ID, false,
 			trailingslashit( plugin_basename( $this->path() ).'/'.$this->languages )
 		);
 	}
@@ -101,7 +111,7 @@ class Application
 			__( 'Flarum Bridge', 'flarum-bridge' ),
 			__( 'Flarum Bridge', 'flarum-bridge' ),
 			'manage_options',
-			$this->id,
+			static::ID,
 			[$this, 'renderSettingsPage']
 		);
 	}
@@ -112,7 +122,7 @@ class Application
 	 */
 	public function registerSettings()
 	{
-		register_setting( $this->id, $this->id );
+		register_setting( static::ID, static::ID );
 	}
 
 	/**
@@ -134,8 +144,8 @@ class Application
 	{
 		$this->render( 'settings', [
 			'defaults' => (object)$this->getDefaults(),
-			'id' => $this->id,
 			'settings' => $this->getSettings(),
+			'id' => static::ID,
 			'title' => __( 'Flarum Bridge Settings', 'flarum-bridge' ),
 		]);
 	}

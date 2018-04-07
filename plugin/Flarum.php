@@ -21,6 +21,7 @@ class Flarum
 	 * @param string $username
 	 * @param string $password
 	 * @return null|WP_User
+	 * @filter authenticate
 	 */
 	public function loginUser( $user, $username, $password )
 	{
@@ -32,6 +33,7 @@ class Flarum
 
 	/**
 	 * @return void
+	 * @action wp_logout
 	 */
 	public function logoutUser()
 	{
@@ -51,6 +53,15 @@ class Flarum
 			$this->redirectToFlarum();
 		}
 		return $redirect;
+	}
+
+	/**
+	 * @param string $password
+	 * @return void
+	 * @action after_password_reset
+	 */
+	public function updateUserPassword( WP_User $user, $password )
+	{
 	}
 
 	/**
