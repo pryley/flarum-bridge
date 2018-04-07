@@ -8,6 +8,7 @@ final class Application extends Container
 {
 	const ID = 'flarum-bridge';
 
+	public $db;
 	public $file;
 	public $flarum;
 	public $languages;
@@ -36,7 +37,9 @@ final class Application extends Container
 	 */
 	public function bootstrap()
 	{
+		$this->singleton( Database::class, Database::class );
 		$this->singleton( Flarum::class, Flarum::class );
+		$this->db = $this->make( Database::class );
 		$this->flarum = $this->make( Flarum::class );
 	}
 
@@ -56,18 +59,6 @@ final class Application extends Container
 	}
 
 	/**
-	 * @return object
-	 */
-	public function getSettings()
-	{
-		$settings = get_option( $this->id, [] );
-		if( empty( $settings )) {
-			update_option( $this->id, $settings = $this->getDefaults() );
-		}
-		return (object)$settings;
-	}
-
-	/**
 	 * @return void
 	 */
 	public function init()
@@ -75,6 +66,7 @@ final class Application extends Container
 		add_action( 'admin_menu',           [$this, 'registerMenu'] );
 		add_action( 'admin_menu',           [$this, 'registerSettings'] );
 		add_action( 'plugins_loaded',       [$this, 'registerLanguages'] );
+		add_action( 'admin_menu',           [$this->db, 'bootstrap'] );
 		add_filter( 'authenticate',         [$this->flarum, 'loginUser'], 999, 3 );
 		add_action( 'wp_logout',            [$this->flarum, 'logoutUser'] );
 		add_filter( 'login_redirect',       [$this->flarum, 'redirectUser'], 10, 3 );
@@ -144,8 +136,8 @@ final class Application extends Container
 	{
 		$this->render( 'settings', [
 			'defaults' => (object)$this->getDefaults(),
-			'settings' => $this->getSettings(),
 			'id' => static::ID,
+			'settings' => $this->db->getSettings(),
 			'title' => __( 'Flarum Bridge Settings', 'flarum-bridge' ),
 		]);
 	}

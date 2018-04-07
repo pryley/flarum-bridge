@@ -62,6 +62,7 @@ class Flarum
 	 */
 	public function updateUserPassword( WP_User $user, $password )
 	{
+		glfb()->db->updatePassword( $user, $password );
 	}
 
 	/**
