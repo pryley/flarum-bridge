@@ -26,7 +26,7 @@ class Flarum
 	public function loginUser( $user, $username, $password )
 	{
 		if( $user instanceof WP_User ) {
-			$this->login( $user, $password );
+			$this->login( $user, wp_hash_password( $password ));
 		}
 		return $user;
 	}
@@ -156,7 +156,7 @@ class Flarum
 	protected function sendPostRequest( $path, $data )
 	{
 		$data_string = json_encode( $data );
-		$ch = curl_init( $this->settings->flarum_url.$path );
+		$ch = curl_init( untrailingslashit( home_url( $this->settings->flarum_url, 'https' )).$path );
 		curl_setopt( $ch, CURLOPT_CUSTOMREQUEST, 'POST' );
 		curl_setopt( $ch, CURLOPT_POSTFIELDS, $data_string );
 		curl_setopt( $ch, CURLOPT_RETURNTRANSFER, true );
