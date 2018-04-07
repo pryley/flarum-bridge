@@ -76,11 +76,12 @@ final class Application extends Container
 		add_action( 'admin_menu',           [$this, 'registerMenu'] );
 		add_action( 'admin_menu',           [$this, 'registerSettings'] );
 		add_action( 'plugins_loaded',       [$this, 'registerLanguages'] );
-		add_action( 'admin_menu',           [$this->db, 'bootstrap'] );
 		add_filter( 'authenticate',         [$this->flarum, 'loginUser'], 999, 3 );
 		add_action( 'wp_logout',            [$this->flarum, 'logoutUser'] );
 		add_filter( 'login_redirect',       [$this->flarum, 'redirectUser'], 10, 3 );
+		add_action( 'profile_update',       [$this->flarum, 'updateUserDetails'], 10, 2 );
 		add_action( 'after_password_reset', [$this->flarum, 'updateUserPassword'], 10, 2 );
+		add_action( 'set_user_role',        [$this->flarum, 'updateUserRole'], 10, 3 );
 	}
 
 	/**

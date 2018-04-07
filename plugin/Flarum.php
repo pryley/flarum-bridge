@@ -56,13 +56,42 @@ class Flarum
 	}
 
 	/**
-	 * @param string $password
+	 * @param int $userId
+	 * @return void
+	 * @action profile_update
+	 */
+	public function updateUserDetails( $userId, WP_User $oldUser )
+	{
+		$user = get_userdata( $userId );
+		if( $user->user_email != $oldUser->user_email ) {
+			glfb()->db->updateEmail( $oldUser, $user->user_email );
+		}
+		if( !empty( filter_input( INPUT_POST, 'pass1' ))) {
+			$this->updateUserPassword( $user, filter_input( INPUT_POST, 'pass2' ));
+		}
+	}
+
+	/**
+	 * @param string $newPassword
 	 * @return void
 	 * @action after_password_reset
 	 */
-	public function updateUserPassword( WP_User $user, $password )
+	public function updateUserPassword( WP_User $user, $newPassword )
 	{
-		glfb()->db->updatePassword( $user, $password );
+		glfb()->db->updatePassword( $user, $newPassword );
+	}
+
+	/**
+	 * @param int $userId
+	 * @param string $role
+	 * @param array $oldRoles
+	 * @return void
+	 * @action set_user_role
+	 */
+	public function updateUserRole( $userId, $role, $oldRoles )
+	{
+		$user = get_userdata( $userId );
+		glfb()->db->updateRole( $user, $role );
 	}
 
 	/**

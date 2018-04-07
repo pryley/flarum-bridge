@@ -15,3 +15,5 @@ spl_autoload_register( function( $className ) {
 		break;
 	}
 });
+
+require_once( ABSPATH.'/wp-admin/includes/file.php' );

@@ -13,15 +13,16 @@ class Database
 	protected $db;
 	protected $prefix;
 
-	/**
-	 * @return array
-	 * @action admin_menu
-	 */
-	public function bootstrap()
+	public function __construct()
 	{
-		$this->config = $this->getFlarumConfig();
-		$this->prefix = $this->config['prefix'];
-		$this->db = $this->getFlarumDatabase();
+		if( !is_admin() )return;
+		if( empty( $this->config )) {
+			$this->config = $this->getFlarumConfig();
+			$this->prefix = $this->config['prefix'];
+		}
+		if( empty( $this->db )) {
+			$this->db = $this->getFlarumDatabase();
+		}
 	}
 
 	/**
@@ -37,25 +38,29 @@ class Database
 	}
 
 	/**
+	 * @param string $newEmail
 	 * @return bool
 	 */
-	public function updateAvatar( WP_User $user )
+	public function updateEmail( WP_User $user, $newEmail )
 	{
+		$this->db->update(
+			$this->prefix.'users',
+			['email' => $newEmail],
+			['email' => $user->user_email]
+		);
 	}
 
 	/**
+	 * @param string $newPassword
 	 * @return bool
 	 */
-	public function updateName( WP_User $user )
+	public function updatePassword( WP_User $user, $newPassword )
 	{
-	}
-
-	/**
-	 * @param string $password
-	 * @return bool
-	 */
-	public function updatePassword( WP_User $user, $password )
-	{
+		$this->db->update(
+			$this->prefix.'users',
+			['password' => wp_hash_password( $newPassword )],
+			['email' => $user->user_email]
+		);
 	}
 
 	/**
@@ -84,7 +89,6 @@ class Database
 	 */
 	protected function getFlarumDatabase()
 	{
-		if( !empty( $this->db ))return;
 		return new wpdb(
 			$this->config['username'],
 			$this->config['password'],
