@@ -65,9 +65,11 @@ class Flarum
 		$user = get_userdata( $userId );
 		if( $user->user_email != $oldUser->user_email ) {
 			glfb()->db->updateEmail( $oldUser, $user->user_email );
+			glfb()->log->debug( 'changed email' );
 		}
 		if( !empty( filter_input( INPUT_POST, 'pass1' ))) {
 			$this->updateUserPassword( $user, filter_input( INPUT_POST, 'pass2' ));
+			glfb()->log->debug( 'updated password' );
 		}
 	}
 
@@ -79,6 +81,7 @@ class Flarum
 	public function updateUserPassword( WP_User $user, $newPassword )
 	{
 		glfb()->db->updatePassword( $user, $newPassword );
+		glfb()->log->debug( 'updated password' );
 	}
 
 	/**
@@ -92,6 +95,7 @@ class Flarum
 	{
 		$user = get_userdata( $userId );
 		glfb()->db->updateRole( $user, $role );
+		glfb()->log->debug( 'updated role' );
 	}
 
 	/**
@@ -121,6 +125,7 @@ class Flarum
 			'password' => $password,
 		];
 		$response = $this->sendPostRequest( '/api/token', $data );
+		glfb()->log->debug( [$data, $response] );
 		return isset( $response['token'] )
 			? $response['token']
 			: '';
@@ -137,6 +142,7 @@ class Flarum
 			$this->signup( $user->user_login, $password, $user->user_email );
 			$token = $this->getToken( $user->user_login, $password );
 		}
+		glfb()->log->debug( 'logged in to flarum' );
 		$this->setRememberMeCookie( $token, $user );
 	}
 
@@ -164,6 +170,7 @@ class Flarum
 	{
 		unset( $_COOKIE[self::REMEMBER_ME_KEY] );
 		$this->setCookie( self::REMEMBER_ME_KEY, '', time() - 10 );
+		glfb()->log->debug( 'logged out of flarum' );
 	}
 
 	/**
@@ -196,6 +203,7 @@ class Flarum
 			'Content-Type: application/json',
 		]);
 		$result = curl_exec( $ch );
+		glfb()->log->debug( [curl_getinfo( $ch ), curl_error( $ch )] );
 		return json_decode( $result, true );
 	}
 
@@ -229,6 +237,7 @@ class Flarum
 				]
 			]
 		];
+		glfb()->log->debug( ['creating flarum user', $data] );
 		$response = $this->sendPostRequest( '/api/users', $data );
 		return isset( $response['data']['id'] );
 	}
