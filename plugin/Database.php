@@ -43,11 +43,11 @@ class Database
 	 */
 	public function updateEmail( WP_User $user, $newEmail )
 	{
-		$this->db->update(
-			$this->prefix.'users',
-			['email' => $newEmail],
-			['email' => $user->user_email]
-		);
+		// $this->db->update(
+		// 	$this->prefix.'users',
+		// 	['email' => $newEmail],
+		// 	['email' => $user->user_email]
+		// );
 	}
 
 	/**
@@ -56,11 +56,11 @@ class Database
 	 */
 	public function updatePassword( WP_User $user, $newPassword )
 	{
-		$this->db->update(
-			$this->prefix.'users',
-			['password' => wp_hash_password( $newPassword )],
-			['email' => $user->user_email]
-		);
+		// $this->db->update(
+		// 	$this->prefix.'users',
+		// 	['password' => wp_hash_password( $newPassword )],
+		// 	['email' => $user->user_email]
+		// );
 	}
 
 	/**
