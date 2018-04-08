@@ -73,9 +73,11 @@ final class Application extends Container
 	 */
 	public function init()
 	{
-		add_action( 'admin_menu',           [$this, 'registerMenu'] );
-		add_action( 'admin_menu',           [$this, 'registerSettings'] );
-		add_action( 'plugins_loaded',       [$this, 'registerLanguages'] );
+		add_action( 'admin_menu',                 [$this, 'registerMenu'] );
+		add_action( 'admin_menu',                 [$this, 'registerSettings'] );
+		add_action( 'plugins_loaded',             [$this, 'registerLanguages'] );
+		add_action( 'user_profile_update_errors', [$this, 'validatePasswordLength'] );
+		add_action( 'validate_password_reset',    [$this, 'validatePasswordLength'] );
 		add_filter( 'authenticate',         [$this->flarum, 'loginUser'], 999, 3 );
 		add_action( 'wp_logout',            [$this->flarum, 'logoutUser'] );
 		add_filter( 'login_redirect',       [$this->flarum, 'redirectUser'], 10, 3 );
@@ -151,5 +153,20 @@ final class Application extends Container
 			'settings' => $this->db->getSettings(),
 			'title' => __( 'Flarum Bridge Settings', 'flarum-bridge' ),
 		]);
+	}
+
+	/**
+	 * @param object $errors
+	 * @return void
+	 */
+	public function validatePasswordLength( $errors )
+	{
+		if( is_wp_error( $errors ) && $errors->get_error_data( 'pass' ))return;
+		$password = sanitize_text_field( filter_input( INPUT_POST, 'pass1' ));
+		if( !empty( $password ) && strlen( $password ) < 8 ) {
+			$errors->add( 'pass',
+				'<strong>ERROR</strong>: '.__( 'Please make sure the password is at least 8 characters.', 'flarum-bridge' )
+			);
+		}
 	}
 }

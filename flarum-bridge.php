@@ -37,7 +37,7 @@ function glfb() {
 add_filter( 'flarum-bridge/log-levels', function( $constants ) {
 	// unset( $constants['ALERT'] );
 	// unset( $constants['CRITICAL'] );
-	unset( $constants['DEBUG'] );
+	// unset( $constants['DEBUG'] );
 	// unset( $constants['EMERGENCY'] );
 	// unset( $constants['ERROR'] );
 	// unset( $constants['INFO'] );
