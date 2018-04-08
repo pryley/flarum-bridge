@@ -26,7 +26,7 @@ class Flarum
 	public function loginUser( $user, $username, $password )
 	{
 		if( $user instanceof WP_User ) {
-			$this->login( $user, wp_hash_password( $password ));
+			$this->login( $user, $password );
 		}
 		return $user;
 	}
@@ -168,8 +168,8 @@ class Flarum
 	 */
 	protected function removeRememberMeCookie()
 	{
-		unset( $_COOKIE[self::REMEMBER_ME_KEY] );
-		$this->setCookie( self::REMEMBER_ME_KEY, '', time() - 10 );
+		unset( $_COOKIE[static::REMEMBER_ME_KEY] );
+		$this->setCookie( static::REMEMBER_ME_KEY, '', time() - 10 );
 		glfb()->log->debug( 'logged out of flarum' );
 	}
 
@@ -179,9 +179,9 @@ class Flarum
 	 * @param int $expire
 	 * @return void
 	 */
-	protected function setCookie( $name, $value, $expire )
+	protected function setCookie( $name, $value, $expire, $path = '/' )
 	{
-		setcookie( $name, $value, $expire, '/', parse_url( home_url(), PHP_URL_HOST ));
+		setcookie( $name, $value, $expire, $path, parse_url( home_url(), PHP_URL_HOST ));
 	}
 
 	/**
@@ -191,15 +191,16 @@ class Flarum
 	 */
 	protected function sendPostRequest( $path, $data )
 	{
-		$data_string = json_encode( $data );
-		$ch = curl_init( untrailingslashit( home_url( $this->settings->flarum_url, 'https' )).$path );
+		$dataString = json_encode( $data );
+		$url = home_url( $this->settings->flarum_url, is_ssl() ? 'https' : 'http' );
+		$ch = curl_init( untrailingslashit( $url ).$path );
 		curl_setopt( $ch, CURLOPT_CUSTOMREQUEST, 'POST' );
-		curl_setopt( $ch, CURLOPT_POSTFIELDS, $data_string );
+		curl_setopt( $ch, CURLOPT_POSTFIELDS, $dataString );
 		curl_setopt( $ch, CURLOPT_RETURNTRANSFER, true );
 		curl_setopt( $ch, CURLOPT_SSL_VERIFYPEER, false ); // for development
 		curl_setopt( $ch, CURLOPT_HTTPHEADER, [
 			'Authorization: Token '.$this->settings->flarum_api_key.'; userId=1',
-			'Content-Length: '.strlen( $data_string ),
+			'Content-Length: '.strlen( $dataString ),
 			'Content-Type: application/json',
 		]);
 		$result = curl_exec( $ch );
@@ -216,7 +217,7 @@ class Flarum
 		$expiry = filter_input( INPUT_POST, 'rememberme' )
 			? time() + $this->getLifetimeInSeconds()// + ( 12 * HOUR_IN_SECONDS ) //login grace period
 			: 0;
-		$this->setCookie( self::REMEMBER_ME_KEY, $token, $expiry );
+		$this->setCookie( static::REMEMBER_ME_KEY, $token, $expiry );
 	}
 
 	/**
