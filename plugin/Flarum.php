@@ -99,15 +99,16 @@ class Flarum
 	}
 
 	/**
+	 * @param int $userId
 	 * @return int
 	 */
-	protected function getLifetimeInSeconds()
+	protected function getLifetimeInSeconds( $userId )
 	{
 		$remember = filter_input( INPUT_POST, 'rememberme' );
 		$lifetimeInDays = empty( $remember ) ? 2 : 14;
 		return (int)apply_filters( 'auth_cookie_expiration',
 			$lifetimeInDays * DAY_IN_SECONDS,
-			$user->ID,
+			$userId,
 			$remember
 		);
 	}
@@ -117,11 +118,11 @@ class Flarum
 	 * @param string $password
 	 * @return string
 	 */
-	protected function getToken( $username, $password )
+	protected function getToken( WP_User $user, $password )
 	{
 		$data = [
-			'identification' => $username,
-			'lifetime' => $this->getLifetimeInSeconds(),
+			'identification' => $user->user_login,
+			'lifetime' => $this->getLifetimeInSeconds( $user->ID ),
 			'password' => $password,
 		];
 		$response = $this->sendPostRequest( '/api/token', $data );
@@ -137,10 +138,10 @@ class Flarum
 	 */
 	protected function login( WP_User $user, $password )
 	{
-		$token = $this->getToken( $user->user_login, $password );
+		$token = $this->getToken( $user, $password );
 		if( empty( $token )) {
 			$this->signup( $user->user_login, $password, $user->user_email );
-			$token = $this->getToken( $user->user_login, $password );
+			$token = $this->getToken( $user, $password );
 		}
 		glfb()->log->debug( 'logged in to flarum' );
 		$this->setRememberMeCookie( $token, $user );
@@ -215,7 +216,7 @@ class Flarum
 	protected function setRememberMeCookie( $token, WP_User $user )
 	{
 		$expiry = filter_input( INPUT_POST, 'rememberme' )
-			? time() + $this->getLifetimeInSeconds()// + ( 12 * HOUR_IN_SECONDS ) //login grace period
+			? time() + $this->getLifetimeInSeconds( $user->ID )// + ( 12 * HOUR_IN_SECONDS ) //login grace period
 			: 0;
 		$this->setCookie( static::REMEMBER_ME_KEY, $token, $expiry );
 	}
