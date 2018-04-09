@@ -150,7 +150,7 @@ class Log
 	 */
 	protected function interpolate( $message, array $context = [] )
 	{
-		if( is_array( $message )) {
+		if( is_array( $message ) || is_object( $message )) {
 			// return htmlspecialchars( print_r( $message, true ), ENT_QUOTES, 'UTF-8' );
 			return print_r( $message, true );
 		}
