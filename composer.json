@@ -1,0 +1,42 @@
+{
+  "name": "geminilabs/flarum-bridge",
+  "type": "wordpress-plugin",
+  "description": "Allow WordPress users to sign-in to a sub-directory Flarum installation",
+  "keywords": [
+    "wordpress",
+    "plugin",
+    "flarum"
+  ],
+  "license": "GPLv3",
+  "authors": [
+    {
+      "name": "Paul Ryley",
+      "email": "paul@geminilabs.io"
+    }
+  ],
+  "archive": {
+    "exclude": [
+      "/tests",
+      "/*.js",
+      "/*.json",
+      "/*.lock",
+      "/*.md",
+      "/*.sh",
+      "/*.xml",
+      "/*.yml",
+      "/.*"
+    ]
+  },
+  "config": {
+    "preferred-install": "dist"
+  },
+  "minimum-stability": "dev",
+  "prefer-stable": true,
+  "require": {
+    "php": "^7.1",
+    "flagrow/flarum-api-client": "dev-master"
+  },
+  "require-dev": {
+    "phpunit/phpunit": "^6.0"
+  }
+}
