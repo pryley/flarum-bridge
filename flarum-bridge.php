@@ -17,12 +17,12 @@
 
 defined( 'WPINC' ) || die;
 
-require_once __DIR__.'/activate.php';
+if( !class_exists( 'GL_Activate' )) {
+	require_once __DIR__.'/activate.php';
+}
 require_once __DIR__.'/autoload.php';
-
 if( GL_Activate::shouldDeactivate( __FILE__ ))return;
-
-$app = (new GeminiLabs\FlarumBridge\Application)->init();
+(new GeminiLabs\FlarumBridge\Application)->init();
 
 /**
  * @return GeminiLabs\FlarumBridge\Application
@@ -30,18 +30,3 @@ $app = (new GeminiLabs\FlarumBridge\Application)->init();
 function glfb() {
 	return GeminiLabs\FlarumBridge\Application::load();
 }
-
-/**
- * @return array
- */
-add_filter( 'flarum-bridge/log-levels', function( $constants ) {
-	// unset( $constants['ALERT'] );
-	// unset( $constants['CRITICAL'] );
-	// unset( $constants['DEBUG'] );
-	// unset( $constants['EMERGENCY'] );
-	// unset( $constants['ERROR'] );
-	// unset( $constants['INFO'] );
-	// unset( $constants['NOTICE'] );
-	// unset( $constants['WARNING'] );
-	return $constants;
-});

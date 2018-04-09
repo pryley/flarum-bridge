@@ -65,11 +65,10 @@ class Flarum
 		$user = get_userdata( $userId );
 		if( $user->user_email != $oldUser->user_email ) {
 			glfb()->db->updateEmail( $oldUser, $user->user_email );
-			glfb()->log->debug( 'changed email' );
+			apply_filters( 'logger', 'changed email' );
 		}
 		if( !empty( filter_input( INPUT_POST, 'pass1' ))) {
 			$this->updateUserPassword( $user, filter_input( INPUT_POST, 'pass2' ));
-			glfb()->log->debug( 'updated password' );
 		}
 	}
 
@@ -81,7 +80,7 @@ class Flarum
 	public function updateUserPassword( WP_User $user, $newPassword )
 	{
 		glfb()->db->updatePassword( $user, $newPassword );
-		glfb()->log->debug( 'updated password' );
+		apply_filters( 'logger', 'updated password' );
 	}
 
 	/**
@@ -95,7 +94,7 @@ class Flarum
 	{
 		$user = get_userdata( $userId );
 		glfb()->db->updateRole( $user, $role );
-		glfb()->log->debug( 'updated role' );
+		apply_filters( 'logger', 'updated role' );
 	}
 
 	/**
@@ -126,7 +125,7 @@ class Flarum
 			'password' => $password,
 		];
 		$response = $this->sendPostRequest( '/api/token', $data );
-		glfb()->log->debug( [$data, $response] );
+		apply_filters( 'logger', [$data, $response] );
 		return isset( $response['token'] )
 			? $response['token']
 			: '';
@@ -143,7 +142,7 @@ class Flarum
 			$this->signup( $user->user_login, $password, $user->user_email );
 			$token = $this->getToken( $user, $password );
 		}
-		glfb()->log->debug( 'logged in to flarum' );
+		apply_filters( 'logger', 'logged in to flarum' );
 		$this->setRememberMeCookie( $token, $user );
 	}
 
@@ -171,7 +170,7 @@ class Flarum
 	{
 		unset( $_COOKIE[static::REMEMBER_ME_KEY] );
 		$this->setCookie( static::REMEMBER_ME_KEY, '', time() - 10 );
-		glfb()->log->debug( 'logged out of flarum' );
+		apply_filters( 'logger', 'logged out of flarum' );
 	}
 
 	/**
@@ -205,7 +204,7 @@ class Flarum
 			'Content-Type: application/json',
 		]);
 		$result = curl_exec( $ch );
-		glfb()->log->debug( [curl_getinfo( $ch ), curl_error( $ch )] );
+		apply_filters( 'logger', [curl_getinfo( $ch ), curl_error( $ch )] );
 		return json_decode( $result, true );
 	}
 
@@ -239,7 +238,7 @@ class Flarum
 				]
 			]
 		];
-		glfb()->log->debug( ['creating flarum user', $data] );
+		apply_filters( 'logger', ['creating flarum user', $data] );
 		$response = $this->sendPostRequest( '/api/users', $data );
 		return isset( $response['data']['id'] );
 	}
