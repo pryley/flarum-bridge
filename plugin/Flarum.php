@@ -63,6 +63,7 @@ class Flarum
 	public function updateUserDetails( $userId, WP_User $oldUser )
 	{
 		$user = get_userdata( $userId );
+		if( !( $user instanceof WP_User ))return;
 		if( $user->user_email != $oldUser->user_email ) {
 			glfb()->db->updateEmail( $oldUser, $user->user_email );
 			apply_filters( 'logger', 'changed email' );

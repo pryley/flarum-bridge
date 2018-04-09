@@ -85,7 +85,7 @@ class Database
 	}
 
 	/**
-	 * @return array
+	 * @return wpdb
 	 */
 	protected function getFlarumDatabase()
 	{

@@ -94,7 +94,7 @@ final class Application extends Container
 	 */
 	public function registerLanguages()
 	{
-		load_plugin_textdomain( static::ID, false,
+		load_plugin_textdomain( static::ID, '',
 			trailingslashit( plugin_basename( $this->path() ).'/'.$this->languages )
 		);
 	}
