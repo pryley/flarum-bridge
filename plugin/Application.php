@@ -78,6 +78,31 @@ final class Application extends Container
 		add_action( 'profile_update',       [$this->flarum, 'updateUserDetails'], 10, 2 );
 		add_action( 'after_password_reset', [$this->flarum, 'updateUserPassword'], 10, 2 );
 		add_action( 'set_user_role',        [$this->flarum, 'updateUserRole'], 10, 3 );
+
+		add_action( 'admin_init', function() {
+			// $api = new \Flagrow\Flarum\Api\Flarum( 'http://support.xtremity.test/forum', [
+			// 	'token' => 'YACub2KLfe8mfmHPcUKtt6t2SMJOGPXnZbqhc3nX; userId=1'
+			// ]);
+
+			// $user = $api->users()->post([
+			// 	"type" => "users",
+			// 	"attributes" => [
+			// 		'username' => 'Adam1',
+			// 		'password' => 'test1234',
+			// 		'email' => 'adam@test.com1',
+			// 	],
+			// ])->request();
+
+			// $editedUser = $api->users()->id( $user->id )->patch([
+			// 		"type" => "users",
+			// 		"id" => $user->id,
+			// 		"attributes" => [
+			// 			"bio" => "Bio was edited",
+			// 		],
+			// ])->request();
+
+			// apply_filters( 'logger', $editedUser );
+		});
 	}
 
 	/**
