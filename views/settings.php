@@ -2,11 +2,8 @@
 
 <div class="wrap">
 	<h1><?= $title; ?></h1>
-
 	<form method="post" action="options.php" enctype="multipart/form-data">
-
 		<?php settings_fields( $id ); ?>
-
 		<table class="form-table" id="settings">
 			<tbody>
 				<tr>
@@ -29,10 +26,8 @@
 				</tr>
 			</tbody>
 		</table>
-
 		<p class="submit">
 			<input type="submit" name="submit" id="submit" class="button button-primary" value="Save Changes">
 		</p>
-
 	</form>
 </div>
