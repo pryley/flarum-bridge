@@ -28,5 +28,9 @@ GeminiLabs\FlarumBridge\Application::load()->init();
  * @return GeminiLabs\FlarumBridge\Application
  */
 function glfb() {
-	return GeminiLabs\FlarumBridge\Application::load();
+	$app = GeminiLabs\FlarumBridge\Application::load();
+	if( func_get_arg(0) && $concrete = $app->make( func_get_arg(0) )) {
+		return $concrete;
+	}
+	return $app;
 }
