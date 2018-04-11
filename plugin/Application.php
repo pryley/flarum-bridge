@@ -67,42 +67,18 @@ final class Application extends Container
 	 */
 	public function init()
 	{
+		add_action( 'plugins_loaded',             [$this, 'registerLanguages'] );
 		add_action( 'admin_menu',                 [$this, 'registerMenu'] );
 		add_action( 'admin_menu',                 [$this, 'registerSettings'] );
-		add_action( 'plugins_loaded',             [$this, 'registerLanguages'] );
 		add_action( 'user_profile_update_errors', [$this, 'validatePasswordLength'] );
 		add_action( 'validate_password_reset',    [$this, 'validatePasswordLength'] );
+		// add_filter( 'pre_get_avatar_data',        [$avatar, 'filterAvatarData'], 10, 2 )
 		add_filter( 'authenticate',         [$this->flarum, 'loginUser'], 999, 3 );
 		add_action( 'wp_logout',            [$this->flarum, 'logoutUser'] );
 		add_filter( 'login_redirect',       [$this->flarum, 'redirectUser'], 10, 3 );
-		add_action( 'profile_update',       [$this->flarum, 'updateUserDetails'], 10, 2 );
-		add_action( 'after_password_reset', [$this->flarum, 'updateUserPassword'], 10, 2 );
-		add_action( 'set_user_role',        [$this->flarum, 'updateUserRole'], 10, 3 );
-
-		add_action( 'admin_init', function() {
-			// $api = new \Flagrow\Flarum\Api\Flarum( 'http://support.xtremity.test/forum', [
-			// 	'token' => 'YACub2KLfe8mfmHPcUKtt6t2SMJOGPXnZbqhc3nX; userId=1'
-			// ]);
-
-			// $user = $api->users()->post([
-			// 	"type" => "users",
-			// 	"attributes" => [
-			// 		'username' => 'Adam1',
-			// 		'password' => 'test1234',
-			// 		'email' => 'adam@test.com1',
-			// 	],
-			// ])->request();
-
-			// $editedUser = $api->users()->id( $user->id )->patch([
-			// 		"type" => "users",
-			// 		"id" => $user->id,
-			// 		"attributes" => [
-			// 			"bio" => "Bio was edited",
-			// 		],
-			// ])->request();
-
-			// apply_filters( 'logger', $editedUser );
-		});
+		// add_action( 'profile_update',       [$this->flarum, 'updateUserDetails'], 10, 2 );
+		// add_action( 'after_password_reset', [$this->flarum, 'updateUserPassword'], 10, 2 );
+		// add_action( 'set_user_role',        [$this->flarum, 'updateUserRole'], 10, 3 );
 	}
 
 	/**
@@ -182,10 +158,9 @@ final class Application extends Container
 	{
 		if( is_wp_error( $errors ) && $errors->get_error_data( 'pass' ))return;
 		$password = sanitize_text_field( filter_input( INPUT_POST, 'pass1' ));
-		if( !empty( $password ) && strlen( $password ) < 8 ) {
-			$errors->add( 'pass',
-				'<strong>ERROR</strong>: '.__( 'Please make sure the password is at least 8 characters.', 'flarum-bridge' )
-			);
-		}
+		if( empty( $password ) || strlen( $password ) > 7 )return;
+		$errors->add( 'pass',
+			'<strong>ERROR</strong>: '.__( 'Please make sure the password is at least 8 characters.', 'flarum-bridge' )
+		);
 	}
 }
