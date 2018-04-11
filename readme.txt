@@ -5,7 +5,7 @@ Tags: flarum, sso
 Requires at least: 4.7
 Requires PHP: 7.1
 Tested up to: 4.9
-Stable tag: 1.0.0-beta
+Stable tag: 1.0.1-beta
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 

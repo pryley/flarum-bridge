@@ -199,7 +199,7 @@ class Flarum
 		curl_setopt( $ch, CURLOPT_RETURNTRANSFER, true );
 		curl_setopt( $ch, CURLOPT_SSL_VERIFYPEER, false ); // for development
 		curl_setopt( $ch, CURLOPT_HTTPHEADER, [
-			'Authorization: Token '.$this->settings->flarum_api_key.'; userId=1',
+			'Authorization: Token '.$this->settings->api_key.'; userId=1',
 			'Content-Length: '.strlen( $dataString ),
 			'Content-Type: application/json',
 		]);

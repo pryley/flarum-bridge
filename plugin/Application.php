@@ -40,10 +40,10 @@ final class Application extends Container
 	public function bootstrap()
 	{
 		$this->singleton( Database::class, Database::class );
-		$this->db = $this->make( Database::class );
 		$this->bind( Flarum::class, function() {
 			return new Flarum( $this->db->getsettings() );
 		});
+		$this->db = $this->make( Database::class );
 		$this->flarum = $this->make( Flarum::class );
 	}
 
@@ -54,7 +54,7 @@ final class Application extends Container
 	public function getDefaults( $key = '' )
 	{
 		$defaults = [
-			'flarum_api_key' => '',
+			'api_key' => '',
 			'flarum_url' => '/forum',
 		];
 		return array_key_exists( $key, $defaults )

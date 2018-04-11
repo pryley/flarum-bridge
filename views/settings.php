@@ -17,11 +17,11 @@
 				</tr>
 				<tr>
 					<th scope="row">
-						<label for="flarum_api_key"><?= __( 'Flarum API Key', 'flarum-bridge' ); ?></label>
+						<label for="api_key"><?= __( 'Flarum API Key', 'flarum-bridge' ); ?></label>
 					</th>
 					<td>
-						<input type="text" id="flarum_api_key" name="<?= $id; ?>[flarum_api_key]" class="regular-text code" aria-describedby="flarum_api_key_description" value="<?= $settings->flarum_api_key; ?>" placeholder="<?= $defaults->flarum_api_key; ?>">
-						<p id="flarum_api_key_description" class="description"><?= __( 'Create a random key in the api_keys table of your Flarum forum and enter it here', 'flarum-bridge' ) ?></p>
+						<input type="text" id="api_key" name="<?= $id; ?>[api_key]" class="regular-text code" aria-describedby="api_key_description" value="<?= $settings->api_key; ?>" placeholder="<?= $defaults->api_key; ?>">
+						<p id="api_key_description" class="description"><?= __( 'Create a random key in the api_keys table of your Flarum forum and enter it here', 'flarum-bridge' ) ?></p>
 					</td>
 				</tr>
 			</tbody>
