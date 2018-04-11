@@ -6,7 +6,7 @@ defined( 'WPINC' ) || die;
  * Checks for minimum system requirments on plugin activation
  * @version 1.0.0
  */
-class GL_Activate
+class GL_Plugin_Check
 {
 	const MIN_PHP_VERSION = '5.6.0';
 	const MIN_WORDPRESS_VERSION = '4.7.0';
