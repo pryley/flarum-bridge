@@ -3,8 +3,8 @@
 namespace GeminiLabs\FlarumBridge;
 
 use GeminiLabs\FlarumBridge\Flarum;
-use WP_Comment
-use WP_Post
+use WP_Comment;
+use WP_Post;
 use WP_User;
 
 class Avatar
@@ -12,11 +12,11 @@ class Avatar
 	/**
 	 * Flarum
 	 */
-	protected $flarum;
+	protected $api;
 
-	public function __construct( Flarum $flarum )
+	public function __construct( Flarum $api )
 	{
-		$this->flarum = $flarum;
+		$this->api = $api;
 	}
 
 	/**
@@ -39,9 +39,12 @@ class Avatar
 	 */
 	public function getAvatar( WP_User $user )
 	{
-		$flarumUser = $flarum->users()->id( get_user_meta( $user->ID, '_flarum_id', true ));
-		if( $flarumUser && !empty( $flarumUser['avatar'] )) {
-			return $flarumUser['avatar'];
+		$flarumUserId = intval( get_user_meta( $user->ID, '_flarum_id', true ));
+		if( $flarumUserId ) {
+			$flarumUser = $this->api->getUser( $flarumUserId );
+			if( $flarumUser->avatarUrl ) {
+				return $flarumUser->avatarUrl;
+			}
 		}
 		return null;
 	}
@@ -54,7 +57,7 @@ class Avatar
 	{
 		$possibleUser = false;
 		if( is_numeric( $idOrEmail )) {
-			$possibleUser = get_user_by( 'id', absint( $idOrEmail )) {
+			$possibleUser = get_user_by( 'id', absint( $idOrEmail ));
 		}
 		else if( is_string( $idOrEmail )) {
 			$possibleUser = get_user_by( 'email', $idOrEmail );

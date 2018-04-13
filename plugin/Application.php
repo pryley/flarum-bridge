@@ -2,6 +2,7 @@
 
 namespace GeminiLabs\FlarumBridge;
 
+use GeminiLabs\FlarumBridge\Avatar;
 use GeminiLabs\FlarumBridge\Container;
 use GeminiLabs\FlarumBridge\Database;
 use GeminiLabs\FlarumBridge\Flarum;
@@ -10,9 +11,10 @@ final class Application extends Container
 {
 	const ID = 'flarum-bridge';
 
+	public $api;
+	public $avatar;
 	public $db;
 	public $file;
-	public $flarum;
 	public $languages;
 	public $name;
 	public $version;
@@ -40,11 +42,12 @@ final class Application extends Container
 	public function bootstrap()
 	{
 		$this->singleton( Database::class, Database::class );
+		$this->db = $this->make( Database::class );
 		$this->bind( Flarum::class, function() {
 			return new Flarum( $this->db->getsettings() );
 		});
-		$this->db = $this->make( Database::class );
-		$this->flarum = $this->make( Flarum::class );
+		$this->api = $this->make( Flarum::class );
+		$this->avatar = $this->make( Avatar::class );
 	}
 
 	/**
@@ -72,13 +75,20 @@ final class Application extends Container
 		add_action( 'admin_menu',                 [$this, 'registerSettings'] );
 		add_action( 'user_profile_update_errors', [$this, 'validatePasswordLength'] );
 		add_action( 'validate_password_reset',    [$this, 'validatePasswordLength'] );
-		// add_filter( 'pre_get_avatar_data',        [$avatar, 'filterAvatarData'], 10, 2 )
-		add_filter( 'authenticate',         [$this->flarum, 'loginUser'], 999, 3 );
-		add_action( 'wp_logout',            [$this->flarum, 'logoutUser'] );
-		add_filter( 'login_redirect',       [$this->flarum, 'redirectUser'], 10, 3 );
-		// add_action( 'profile_update',       [$this->flarum, 'updateUserDetails'], 10, 2 );
-		// add_action( 'after_password_reset', [$this->flarum, 'updateUserPassword'], 10, 2 );
-		// add_action( 'set_user_role',        [$this->flarum, 'updateUserRole'], 10, 3 );
+		add_filter( 'pre_get_avatar_data',        [$this->avatar, 'filterAvatarData'], 10, 2 );
+		add_filter( 'authenticate',               [$this->api, 'filterAuthentication'], 999, 3 );
+		add_action( 'wp_logout',                  [$this->api, 'logoutUser'] );
+		add_filter( 'login_redirect',             [$this->api, 'filterLoginRedirect'], 10, 3 );
+		// add_action( 'profile_update',       [$this->api, 'updateUserDetails'], 10, 2 );
+		// add_action( 'after_password_reset', [$this->api, 'updateUserPassword'], 10, 2 );
+		// add_action( 'set_user_role',        [$this->api, 'updateUserRole'], 10, 3 );
+
+		// add_action( 'admin_init', function() {
+		// 	$result = $this->api->editUser( 1, [
+		// 		'password' => 'test1234',
+		// 	]);
+		// 	apply_filters( 'logger', $result );
+		// });
 	}
 
 	/**

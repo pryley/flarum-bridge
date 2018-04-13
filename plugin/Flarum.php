@@ -2,18 +2,47 @@
 
 namespace GeminiLabs\FlarumBridge;
 
+use Flagrow\Flarum\Api\Flarum;
+use Flagrow\Flarum\Api\Resource\Collection;
+use Flagrow\Flarum\Api\Resource\Item;
 use WP_Error;
 use WP_User;
 
 class Flarum
 {
-	const REMEMBER_ME_KEY = 'flarum_remember';
+	const FLARUM_COOKIE_NAME = 'flarum_remember';
 
-	protected $settings;
+	protected $api;
 
 	public function __construct( $settings )
 	{
-		$this->settings = $settings;
+		$this->api = new Flarum( home_url( $settings->flarum_url ), [
+			'token' => $settings->api_key,
+		]);
+	}
+
+	/**
+	 * @return Item|object
+	 */
+	public function createUser( array $attributes )
+	{
+		return $this->api->users()->post([
+			'attributes' => $attributes,
+			'type' => 'users',
+		])->request();
+	}
+
+	/**
+	 * @param int $userId
+	 * @return Item|object
+	 */
+	public function editUser( $userId, array $attributes )
+	{
+		return $this->api->users()->id( $userId )->patch([
+			'attributes' => $attributes,
+			'id' => $userId,
+			'type' => 'users',
+		])->request();
 	}
 
 	/**
@@ -23,12 +52,59 @@ class Flarum
 	 * @return null|WP_User
 	 * @filter authenticate
 	 */
-	public function loginUser( $user, $username, $password )
+	public function filterAuthentication( $user, $username, $password )
 	{
 		if( $user instanceof WP_User ) {
-			$this->login( $user, $password );
+			$this->loginUser( $user, $password );
 		}
 		return $user;
+	}
+
+	/**
+	 * @param string $redirect
+	 * @param string $requested_redirect
+	 * @param WP_User|WP_Error $user
+	 * @return string|void
+	 * @filter login_redirect
+	 */
+	public function filterLoginRedirect( $redirect, $requestedRedirect, $user )
+	{
+		if( $redirect === 'forum' && $user instanceof WP_User ) {
+			wp_redirect( $this->settings->flarum_url );
+			exit;
+		}
+		return $redirect;
+	}
+
+	/**
+	 * @param int $userId
+	 * @return Item|object
+	 */
+	public function getUser( $userId )
+	{
+		return $this->api->users()->id( $userId )->request();
+	}
+
+	/**
+	 * @param string $password
+	 * @return void
+	 */
+	public function loginUser( WP_User $user, $password )
+	{
+		$authorization = $this->getAuthorization( $user, $password );
+		if( !isset( $authorization->token )) {
+			$flarumUser = $this->createUser([
+				'email' => $user->user_email,
+				'password' => $password,
+				'username' => $user->user_login,
+			]);
+			$authorization = $this->getAuthorization( $user, $password );
+		}
+		if( isset( $authorization->token )) {
+			update_user_meta( $user->ID, '_flarum_id', $authorization->userId );
+			$this->setRememberMeCookie( $authorization->token, $user );
+			apply_filters( 'logger', 'logged in to flarum' );
+		}
 	}
 
 	/**
@@ -37,64 +113,26 @@ class Flarum
 	 */
 	public function logoutUser()
 	{
-		$this->logout();
+		$this->setCookie( static::FLARUM_COOKIE_NAME, '', time() - 10 );
+		unset( $_COOKIE[static::FLARUM_COOKIE_NAME] );
+		apply_filters( 'logger', 'logged out of flarum' );
 	}
 
 	/**
-	 * @param string $redirect
-	 * @param string $requested_redirect
-	 * @param WP_User|WP_Error $user
-	 * @return string
-	 * @filter login_redirect
+	 * @param string $password
+	 * @return object|false
 	 */
-	public function redirectUser( $redirect, $requestedRedirect, $user )
+	protected function getAuthorization( WP_User $user, $password )
 	{
-		if( $redirect === 'forum' && $user instanceof WP_User ) {
-			$this->redirectToFlarum();
-		}
-		return $redirect;
-	}
-
-	/**
-	 * @param int $userId
-	 * @return void
-	 * @action profile_update
-	 */
-	public function updateUserDetails( $userId, WP_User $oldUser )
-	{
-		$user = get_userdata( $userId );
-		if( $user->user_email != $oldUser->user_email ) {
-			glfb()->db->updateEmail( $oldUser, $user->user_email );
-			apply_filters( 'logger', 'changed email' );
-		}
-		if( !empty( filter_input( INPUT_POST, 'pass1' ))) {
-			$this->updateUserPassword( $user, filter_input( INPUT_POST, 'pass2' ));
-		}
-	}
-
-	/**
-	 * @param string $newPassword
-	 * @return void
-	 * @action after_password_reset
-	 */
-	public function updateUserPassword( WP_User $user, $newPassword )
-	{
-		glfb()->db->updatePassword( $user, $newPassword );
-		apply_filters( 'logger', 'updated password' );
-	}
-
-	/**
-	 * @param int $userId
-	 * @param string $role
-	 * @param array $oldRoles
-	 * @return void
-	 * @action set_user_role
-	 */
-	public function updateUserRole( $userId, $role, $oldRoles )
-	{
-		$user = get_userdata( $userId );
-		glfb()->db->updateRole( $user, $role );
-		apply_filters( 'logger', 'updated role' );
+		$authorization = $this->api->authenticate([
+			'identification' => $user->user_email,
+			'lifetime' => $this->getLifetimeInSeconds( $user->ID ),
+			'password' => $password,
+		]);
+		apply_filters( 'logger', $authorization );
+		return isset( $authorization->token )
+			? $authorization
+			: false;
 	}
 
 	/**
@@ -113,67 +151,6 @@ class Flarum
 	}
 
 	/**
-	 * @param string $username
-	 * @param string $password
-	 * @return string
-	 */
-	protected function getToken( WP_User $user, $password )
-	{
-		$data = [
-			'identification' => $user->user_login,
-			'lifetime' => $this->getLifetimeInSeconds( $user->ID ),
-			'password' => $password,
-		];
-		$response = $this->sendPostRequest( '/api/token', $data );
-		apply_filters( 'logger', [$data, $response] );
-		return isset( $response['token'] )
-			? $response['token']
-			: '';
-	}
-
-	/**
-	 * @param string $password
-	 * @return void
-	 */
-	protected function login( WP_User $user, $password )
-	{
-		$token = $this->getToken( $user, $password );
-		if( empty( $token )) {
-			$this->signup( $user->user_login, $password, $user->user_email );
-			$token = $this->getToken( $user, $password );
-		}
-		apply_filters( 'logger', 'logged in to flarum' );
-		$this->setRememberMeCookie( $token, $user );
-	}
-
-	/**
-	 * @return void
-	 */
-	protected function logout()
-	{
-		$this->removeRememberMeCookie();
-	}
-
-	/**
-	 * @return void
-	 */
-	protected function redirectToFlarum()
-	{
-		wp_redirect( $this->settings->flarum_url );
-		exit;
-	}
-
-	/**
-	 * @return void
-	 */
-	protected function removeRememberMeCookie()
-	{
-		unset( $_COOKIE[static::REMEMBER_ME_KEY] );
-		$this->setCookie( static::REMEMBER_ME_KEY, '', time() - 10 );
-		apply_filters( 'logger', 'logged out of flarum' );
-	}
-
-	/**
 	 * @param string $name
 	 * @param string $value
 	 * @param int $expire
@@ -185,30 +162,6 @@ class Flarum
 	}
 
 	/**
-	 * @param string $path
-	 * @param array $data
-	 * @return array
-	 */
-	protected function sendPostRequest( $path, $data )
-	{
-		$dataString = json_encode( $data );
-		$url = home_url( $this->settings->flarum_url, is_ssl() ? 'https' : 'http' );
-		$ch = curl_init( untrailingslashit( $url ).$path );
-		curl_setopt( $ch, CURLOPT_CUSTOMREQUEST, 'POST' );
-		curl_setopt( $ch, CURLOPT_POSTFIELDS, $dataString );
-		curl_setopt( $ch, CURLOPT_RETURNTRANSFER, true );
-		curl_setopt( $ch, CURLOPT_SSL_VERIFYPEER, false ); // for development
-		curl_setopt( $ch, CURLOPT_HTTPHEADER, [
-			'Authorization: Token '.$this->settings->api_key.'; userId=1',
-			'Content-Length: '.strlen( $dataString ),
-			'Content-Type: application/json',
-		]);
-		$result = curl_exec( $ch );
-		apply_filters( 'logger', [curl_getinfo( $ch ), curl_error( $ch )] );
-		return json_decode( $result, true );
-	}
-
-	/**
 	 * @param string $token
 	 * @return void
 	 */
@@ -217,29 +170,6 @@ class Flarum
 		$expiry = filter_input( INPUT_POST, 'rememberme' )
 			? time() + $this->getLifetimeInSeconds( $user->ID )// + ( 12 * HOUR_IN_SECONDS ) //login grace period
 			: 0;
-		$this->setCookie( static::REMEMBER_ME_KEY, $token, $expiry );
-	}
-
-	/**
-	 * @param string $username
-	 * @param string $password
-	 * @param string $email
-	 * @return bool
-	 */
-	protected function signup( $username, $password, $email )
-	{
-		$data = [
-			"data" => [
-				"type" => "users",
-				"attributes" => [
-					"username" => $username,
-					"password" => $password,
-					"email" => $email,
-				]
-			]
-		];
-		apply_filters( 'logger', ['creating flarum user', $data] );
-		$response = $this->sendPostRequest( '/api/users', $data );
-		return isset( $response['data']['id'] );
+		$this->setCookie( static::FLARUM_COOKIE_NAME, $token, $expiry );
 	}
 }
