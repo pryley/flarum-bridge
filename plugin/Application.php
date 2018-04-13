@@ -2,6 +2,7 @@
 
 namespace GeminiLabs\FlarumBridge;
 
+use GeminiLabs\FlarumBridge\Avatar;
 use GeminiLabs\FlarumBridge\Container;
 use GeminiLabs\FlarumBridge\Database;
 use GeminiLabs\FlarumBridge\Flarum;
@@ -10,9 +11,10 @@ final class Application extends Container
 {
 	const ID = 'flarum-bridge';
 
+	public $api;
+	public $avatar;
 	public $db;
 	public $file;
-	public $flarum;
 	public $languages;
 	public $name;
 	public $version;
@@ -44,7 +46,8 @@ final class Application extends Container
 		$this->bind( Flarum::class, function() {
 			return new Flarum( $this->db->getsettings() );
 		});
-		$this->flarum = $this->make( Flarum::class );
+		$this->api = $this->make( Flarum::class );
+		$this->avatar = $this->make( Avatar::class );
 	}
 
 	/**
@@ -54,7 +57,7 @@ final class Application extends Container
 	public function getDefaults( $key = '' )
 	{
 		$defaults = [
-			'flarum_api_key' => '',
+			'api_key' => '',
 			'flarum_url' => '/forum',
 		];
 		return array_key_exists( $key, $defaults )
@@ -67,17 +70,25 @@ final class Application extends Container
 	 */
 	public function init()
 	{
+		add_action( 'plugins_loaded',             [$this, 'registerLanguages'] );
 		add_action( 'admin_menu',                 [$this, 'registerMenu'] );
 		add_action( 'admin_menu',                 [$this, 'registerSettings'] );
-		add_action( 'plugins_loaded',             [$this, 'registerLanguages'] );
 		add_action( 'user_profile_update_errors', [$this, 'validatePasswordLength'] );
 		add_action( 'validate_password_reset',    [$this, 'validatePasswordLength'] );
-		add_filter( 'authenticate',         [$this->flarum, 'loginUser'], 999, 3 );
-		add_action( 'wp_logout',            [$this->flarum, 'logoutUser'] );
-		add_filter( 'login_redirect',       [$this->flarum, 'redirectUser'], 10, 3 );
-		add_action( 'profile_update',       [$this->flarum, 'updateUserDetails'], 10, 2 );
-		add_action( 'after_password_reset', [$this->flarum, 'updateUserPassword'], 10, 2 );
-		add_action( 'set_user_role',        [$this->flarum, 'updateUserRole'], 10, 3 );
+		add_filter( 'pre_get_avatar_data',        [$this->avatar, 'filterAvatarData'], 10, 2 );
+		add_filter( 'authenticate',               [$this->api, 'filterAuthentication'], 999, 3 );
+		add_action( 'wp_logout',                  [$this->api, 'logoutUser'] );
+		add_filter( 'login_redirect',             [$this->api, 'filterLoginRedirect'], 10, 3 );
+		// add_action( 'profile_update',       [$this->api, 'updateUserDetails'], 10, 2 );
+		// add_action( 'after_password_reset', [$this->api, 'updateUserPassword'], 10, 2 );
+		// add_action( 'set_user_role',        [$this->api, 'updateUserRole'], 10, 3 );
+
+		// add_action( 'admin_init', function() {
+		// 	$result = $this->api->editUser( 1, [
+		// 		'password' => 'test1234',
+		// 	]);
+		// 	apply_filters( 'logger', $result );
+		// });
 	}
 
 	/**
@@ -157,10 +168,9 @@ final class Application extends Container
 	{
 		if( is_wp_error( $errors ) && $errors->get_error_data( 'pass' ))return;
 		$password = sanitize_text_field( filter_input( INPUT_POST, 'pass1' ));
-		if( !empty( $password ) && strlen( $password ) < 8 ) {
-			$errors->add( 'pass',
-				'<strong>ERROR</strong>: '.__( 'Please make sure the password is at least 8 characters.', 'flarum-bridge' )
-			);
-		}
+		if( empty( $password ) || strlen( $password ) > 7 )return;
+		$errors->add( 'pass',
+			'<strong>ERROR</strong>: '.__( 'Please make sure the password is at least 8 characters.', 'flarum-bridge' )
+		);
 	}
 }

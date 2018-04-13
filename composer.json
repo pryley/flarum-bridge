@@ -1,12 +1,11 @@
 {
   "name": "geminilabs/flarum-bridge",
   "type": "wordpress-plugin",
-  "description": "Allows WordPress users to sign-in to a sub-directory Flarum installation",
+  "description": "Allow WordPress users to sign-in to a sub-directory Flarum installation",
   "keywords": [
     "wordpress",
     "plugin",
-    "flarum",
-    "sso"
+    "flarum"
   ],
   "license": "GPLv3",
   "authors": [
@@ -31,9 +30,19 @@
   "config": {
     "preferred-install": "dist"
   },
+  "repositories": [
+    {
+      "type": "git",
+      "url": "https://github.com/geminilabs/flarum-api-client.git"
+    }
+  ],
   "minimum-stability": "dev",
   "prefer-stable": true,
   "require": {
-    "php": ">=5.6"
+    "php": "^7.1",
+    "flagrow/flarum-api-client": "*@dev"
+  },
+  "require-dev": {
+    "phpunit/phpunit": "^6.0"
   }
 }
