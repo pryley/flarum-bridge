@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "c49cc2cf6c56cdc0bb056786ead9aed5",
+    "content-hash": "2a6be8fbf69d29e667f67b7b4e36c694",
     "packages": [
         {
             "name": "doctrine/inflector",
@@ -75,31 +75,23 @@
         },
         {
             "name": "flagrow/flarum-api-client",
-            "version": "dev-master",
+            "version": "0.1.2",
             "source": {
                 "type": "git",
-                "url": "https://github.com/flagrow/flarum-api-client.git",
-                "reference": "98bb9ba3b90f1ccbb1649c0ef1beaf9bbff954ae"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/flagrow/flarum-api-client/zipball/98bb9ba3b90f1ccbb1649c0ef1beaf9bbff954ae",
-                "reference": "98bb9ba3b90f1ccbb1649c0ef1beaf9bbff954ae",
-                "shasum": ""
+                "url": "https://github.com/geminilabs/flarum-api-client.git",
+                "reference": "bdb6b9cf9fd58ac7dcc979609644c748a8679d7a"
             },
             "require": {
                 "guzzlehttp/guzzle": "^6.1.1",
-                "illuminate/cache": "^5.3",
-                "illuminate/support": "^5.3",
-                "php": "^7.1"
+                "illuminate/support": "^5.1"
             },
             "require-dev": {
-                "phpunit/phpunit": "^6.0"
+                "phpunit/phpunit": "^5.1.4"
             },
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "0.2.x-dev"
+                    "dev-master": "0.1.x-dev"
                 }
             },
             "autoload": {
@@ -107,11 +99,19 @@
                     "Flagrow\\Flarum\\Api\\": "src/"
                 }
             },
-            "notification-url": "https://packagist.org/downloads/",
+            "autoload-dev": {
+                "psr-4": {
+                    "Flagrow\\Flarum\\Api\\Tests\\": "tests/stub"
+                }
+            },
             "license": [
                 "MIT"
             ],
             "authors": [
+                {
+                    "name": "Matteo Pompili",
+                    "email": "matpompili@gmail.com"
+                },
                 {
                     "name": "Daniël Klabbers",
                     "email": "daniel+flarum@klabbers.email",
@@ -124,7 +124,11 @@
                 "flagrow",
                 "flarum"
             ],
-            "time": "2017-05-22T14:12:02+00:00"
+            "support": {
+                "issues": "https://github.com/flagrow/flarum-api-client/issues",
+                "source": "https://github.com/flagrow/flarum-api-client"
+            },
+            "time": "2016-01-22T20:35:32+00:00"
         },
         {
             "name": "guzzlehttp/guzzle",
@@ -306,55 +310,6 @@
                 "url"
             ],
             "time": "2017-03-20T17:10:46+00:00"
-        },
-        {
-            "name": "illuminate/cache",
-            "version": "v5.6.16",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/illuminate/cache.git",
-                "reference": "c04e07baf0377671031b12469c3165c4c2ebb3e4"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/illuminate/cache/zipball/c04e07baf0377671031b12469c3165c4c2ebb3e4",
-                "reference": "c04e07baf0377671031b12469c3165c4c2ebb3e4",
-                "shasum": ""
-            },
-            "require": {
-                "illuminate/contracts": "5.6.*",
-                "illuminate/support": "5.6.*",
-                "php": "^7.1.3"
-            },
-            "suggest": {
-                "illuminate/database": "Required to use the database cache driver (5.6.*).",
-                "illuminate/filesystem": "Required to use the file cache driver (5.6.*).",
-                "illuminate/redis": "Required to use the redis cache driver (5.6.*)."
-            },
-            "type": "library",
-            "extra": {
-                "branch-alias": {
-                    "dev-master": "5.6-dev"
-                }
-            },
-            "autoload": {
-                "psr-4": {
-                    "Illuminate\\Cache\\": ""
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Taylor Otwell",
-                    "email": "taylor@laravel.com"
-                }
-            ],
-            "description": "The Illuminate Cache package.",
-            "homepage": "https://laravel.com",
-            "time": "2018-04-07T17:05:26+00:00"
         },
         {
             "name": "illuminate/contracts",
@@ -1453,16 +1408,16 @@
         },
         {
             "name": "phpunit/phpunit",
-            "version": "6.5.7",
+            "version": "6.5.8",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/phpunit.git",
-                "reference": "6bd77b57707c236833d2b57b968e403df060c9d9"
+                "reference": "4f21a3c6b97c42952fd5c2837bb354ec0199b97b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/6bd77b57707c236833d2b57b968e403df060c9d9",
-                "reference": "6bd77b57707c236833d2b57b968e403df060c9d9",
+                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/4f21a3c6b97c42952fd5c2837bb354ec0199b97b",
+                "reference": "4f21a3c6b97c42952fd5c2837bb354ec0199b97b",
                 "shasum": ""
             },
             "require": {
@@ -1533,7 +1488,7 @@
                 "testing",
                 "xunit"
             ],
-            "time": "2018-02-26T07:01:09+00:00"
+            "time": "2018-04-10T11:38:34+00:00"
         },
         {
             "name": "phpunit/phpunit-mock-objects",
