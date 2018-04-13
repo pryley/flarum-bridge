@@ -21,7 +21,7 @@ if( !class_exists( 'GL_Plugin_Check' )) {
 	require_once __DIR__.'/activate.php';
 }
 require_once __DIR__.'/autoload.php';
-if( GL_Activate::shouldDeactivate( __FILE__, ['php' => '7.1'] ))return;
+if( GL_Plugin_Check::shouldDeactivate( __FILE__, ['php' => '7.1'] ))return;
 GeminiLabs\FlarumBridge\Application::load()->init();
 
 /**
