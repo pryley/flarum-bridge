@@ -2,7 +2,7 @@
 
 namespace GeminiLabs\FlarumBridge;
 
-use Flagrow\Flarum\Api\Flarum;
+use Flagrow\Flarum\Api\Flarum as Api;
 use Flagrow\Flarum\Api\Resource\Collection;
 use Flagrow\Flarum\Api\Resource\Item;
 use WP_Error;
@@ -13,12 +13,14 @@ class Flarum
 	const FLARUM_COOKIE_NAME = 'flarum_remember';
 
 	protected $api;
+	protected $settings;
 
 	public function __construct( $settings )
 	{
-		$this->api = new Flarum( home_url( $settings->flarum_url ), [
+		$this->api = new Api( home_url( $settings->flarum_url ), [
 			'token' => $settings->api_key,
 		]);
+		$this->settings = $settings;
 	}
 
 	/**
@@ -93,7 +95,7 @@ class Flarum
 	{
 		$authorization = $this->getAuthorization( $user, $password );
 		if( !isset( $authorization->token )) {
-			$flarumUser = $this->createUser([
+			$this->createUser([
 				'email' => $user->user_email,
 				'password' => $password,
 				'username' => $user->user_login,
