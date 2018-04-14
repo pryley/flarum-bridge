@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "2a6be8fbf69d29e667f67b7b4e36c694",
+    "content-hash": "39459cebe1659741187cfc2503513879",
     "packages": [
         {
             "name": "doctrine/inflector",
@@ -75,23 +75,25 @@
         },
         {
             "name": "flagrow/flarum-api-client",
-            "version": "0.1.2",
+            "version": "dev-master",
             "source": {
                 "type": "git",
                 "url": "https://github.com/geminilabs/flarum-api-client.git",
-                "reference": "bdb6b9cf9fd58ac7dcc979609644c748a8679d7a"
+                "reference": "e187e21a8ab3d4704bf133461f2ebac52b528ed9"
             },
             "require": {
                 "guzzlehttp/guzzle": "^6.1.1",
-                "illuminate/support": "^5.1"
+                "illuminate/cache": "^5.3",
+                "illuminate/support": "^5.3",
+                "php": "^7.1"
             },
             "require-dev": {
-                "phpunit/phpunit": "^5.1.4"
+                "phpunit/phpunit": "^6.0"
             },
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "0.1.x-dev"
+                    "dev-master": "0.2.x-dev"
                 }
             },
             "autoload": {
@@ -101,17 +103,13 @@
             },
             "autoload-dev": {
                 "psr-4": {
-                    "Flagrow\\Flarum\\Api\\Tests\\": "tests/stub"
+                    "Flagrow\\Flarum\\Api\\Tests\\": "tests"
                 }
             },
             "license": [
                 "MIT"
             ],
             "authors": [
-                {
-                    "name": "Matteo Pompili",
-                    "email": "matpompili@gmail.com"
-                },
                 {
                     "name": "Daniël Klabbers",
                     "email": "daniel+flarum@klabbers.email",
@@ -128,7 +126,7 @@
                 "issues": "https://github.com/flagrow/flarum-api-client/issues",
                 "source": "https://github.com/flagrow/flarum-api-client"
             },
-            "time": "2016-01-22T20:35:32+00:00"
+            "time": "2018-04-13T16:19:27+00:00"
         },
         {
             "name": "guzzlehttp/guzzle",
@@ -310,6 +308,55 @@
                 "url"
             ],
             "time": "2017-03-20T17:10:46+00:00"
+        },
+        {
+            "name": "illuminate/cache",
+            "version": "v5.6.16",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/illuminate/cache.git",
+                "reference": "c04e07baf0377671031b12469c3165c4c2ebb3e4"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/illuminate/cache/zipball/c04e07baf0377671031b12469c3165c4c2ebb3e4",
+                "reference": "c04e07baf0377671031b12469c3165c4c2ebb3e4",
+                "shasum": ""
+            },
+            "require": {
+                "illuminate/contracts": "5.6.*",
+                "illuminate/support": "5.6.*",
+                "php": "^7.1.3"
+            },
+            "suggest": {
+                "illuminate/database": "Required to use the database cache driver (5.6.*).",
+                "illuminate/filesystem": "Required to use the file cache driver (5.6.*).",
+                "illuminate/redis": "Required to use the redis cache driver (5.6.*)."
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "5.6-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Illuminate\\Cache\\": ""
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Taylor Otwell",
+                    "email": "taylor@laravel.com"
+                }
+            ],
+            "description": "The Illuminate Cache package.",
+            "homepage": "https://laravel.com",
+            "time": "2018-04-07T17:05:26+00:00"
         },
         {
             "name": "illuminate/contracts",
