@@ -51,11 +51,11 @@ class Avatar
 
 	/**
 	 * @param int|string|WP_Comment|WP_Post|WP_User $idOrEmail
-	 * @return false|WP_User
+	 * @return false|WP_User|WP_Comment
 	 */
 	protected function getUserFrom( $idOrEmail )
 	{
-		$possibleUser = false;
+		$possibleUser = $idOrEmail;
 		if( is_numeric( $idOrEmail )) {
 			$possibleUser = get_user_by( 'id', absint( $idOrEmail ));
 		}
