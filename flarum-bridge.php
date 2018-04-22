@@ -6,7 +6,7 @@
  *
  * Plugin Name: Flarum Bridge
  * Description: Allow WordPress users to sign-in to a sub-directory Flarum installation
- * Version:     1.0.1-beta
+ * Version:     1.0.0-beta2
  * Author:      Paul Ryley
  * Author URI:  https://profiles.wordpress.org/pryley#content-plugins
  * License:     GPL3
@@ -21,7 +21,7 @@ if( !class_exists( 'GL_Plugin_Check' )) {
 	require_once __DIR__.'/activate.php';
 }
 require_once __DIR__.'/autoload.php';
-if( GL_Plugin_Check::shouldDeactivate( __FILE__, ['php' => '7.1'] ))return;
+if( GL_Plugin_Check::shouldDeactivate( __FILE__, array( 'php' => '7.1' )))return;
 GeminiLabs\FlarumBridge\Application::load()->init();
 
 /**

@@ -4,7 +4,7 @@ defined( 'WPINC' ) || die;
 
 /**
  * Checks for minimum system requirments on plugin activation
- * @version 1.0.0
+ * @version 1.0.1
  */
 class GL_Plugin_Check
 {
@@ -27,22 +27,26 @@ class GL_Plugin_Check
 	protected static $versions;
 
 	/**
-	 * @return bool
-	 */
-	public static function isValid( array $args = array() )
-	{
-		$versions = static::normalize( $args );
-		return static::isPhpValid( $versions->php ) && static::isWpValid( $versions->wordpress );
-	}
-
-	/**
 	 * @param string $version
 	 * @return bool
 	 */
 	public static function isPhpValid( $version = '' )
 	{
-		$versions = array( 'php' => $version );
-		return !version_compare( PHP_VERSION, static::normalize( $versions )->php, '<' );
+		if( !empty( $version )) {
+			static::normalize( array( 'php' => $version ));
+		}
+		return !version_compare( PHP_VERSION, static::$versions->php, '<' );
+	}
+
+	/**
+	 * @return bool
+	 */
+	public static function isValid( array $args = array() )
+	{
+		if( !empty( $args )) {
+			static::normalize( $args );
+		}
+		return static::isPhpValid() && static::isWpValid();
 	}
 
 	/**
@@ -52,14 +56,17 @@ class GL_Plugin_Check
 	public static function isWpValid( $version = '' )
 	{
 		global $wp_version;
-		$versions = array( 'wordpress' => $version );
-		return !version_compare( $wp_version, static::normalize( $versions )->wordpress, '<' );
+		if( !empty( $version )) {
+			static::normalize( array( 'wordpress' => $version ));
+		}
+		return !version_compare( $wp_version, static::$versions->wordpress, '<' );
 	}
 
 	/**
+	 * @param string $file
 	 * @return bool
 	 */
-	public static function shouldDeactivate( $file, array $args = [] )
+	public static function shouldDeactivate( $file, array $args = array() )
 	{
 		if( empty( static::$instance )) {
 			static::$file = realpath( $file );
@@ -75,6 +82,7 @@ class GL_Plugin_Check
 	}
 
 	/**
+	 * @param string $plugin
 	 * @return void
 	 */
 	public function deactivate( $plugin )
@@ -92,9 +100,9 @@ class GL_Plugin_Check
 	/**
 	 * @return object
 	 */
-	protected static function normalize( array $args = [] )
+	protected static function normalize( array $args = array() )
 	{
-		return (object) wp_parse_args( $args, array(
+		return (object)wp_parse_args( $args, array(
 			'php' => static::MIN_PHP_VERSION,
 			'wordpress' => static::MIN_WORDPRESS_VERSION,
 		));
@@ -131,14 +139,14 @@ class GL_Plugin_Check
 		if( !static::isPhpValid() ) {
 			printf( $noticeTemplate,
 				sprintf( $messages[0], $pluginName ),
-				sprintf( $messages[1], $messages[3].' '.(static::$versions)->php ),
+				sprintf( $messages[1], $messages[3].' '.static::$versions->php ),
 				sprintf( $messages[2], PHP_VERSION )
 			);
 		}
 		else if( !static::isWpValid() ) {
 			printf( $noticeTemplate,
 				sprintf( $messages[0], $pluginName ),
-				sprintf( $messages[1], $messages[4].' '.(static::$versions)->wordpress ),
+				sprintf( $messages[1], $messages[4].' '.static::$versions->wordpress ),
 				sprintf( '<a href="%s">%s</a>', admin_url( 'update-core.php' ), $messages[5] )
 			);
 		}

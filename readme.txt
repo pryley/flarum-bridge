@@ -5,7 +5,7 @@ Tags: flarum, sso
 Requires at least: 4.7
 Requires PHP: 7.1
 Tested up to: 4.9
-Stable tag: 1.0.1-beta
+Stable tag: 1.0.0-beta2
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -36,6 +36,6 @@ You will need to generate and add this manually to the Flarum api_keys database 
 
 == Changelog ==
 
-= 1.0.0 (2018-04-07) =
+= 1.0.0 (2018-??-??) =
 
 - Initial plugin release

@@ -2,6 +2,7 @@
 
 namespace GeminiLabs\FlarumBridge;
 
+use GeminiLabs\FlarumBridge\Database;
 use GeminiLabs\FlarumBridge\Flarum;
 use WP_Comment;
 use WP_Post;
@@ -14,15 +15,27 @@ class Avatar
 	 */
 	protected $api;
 
-	public function __construct( Flarum $api )
+	/**
+	 * Database
+	 */
+	protected $db;
+
+	/**
+	 * string
+	 */
+	protected $flarumUsername;
+
+	public function __construct( Flarum $api, Database $db )
 	{
 		$this->api = $api;
+		$this->db = $db;
 	}
 
 	/**
 	 * @param array $args
 	 * @param int|string|WP_Comment|WP_Post|WP_User $idOrEmail
 	 * @return array
+	 * @filter pre_get_avatar_data
 	 */
 	public function filterAvatarData( $args, $idOrEmail )
 	{
@@ -35,6 +48,27 @@ class Avatar
 	}
 
 	/**
+	 * @param string $translation
+	 * @param string $text
+	 * @param string $domain
+	 * @return string
+	 * @filter gettext
+	 */
+	public function filterGettext( $translation, $text, $domain )
+	{
+		if( $domain != 'default' || !is_admin() ) {
+			return $translation;
+		}
+		if( $text == 'You can change your profile picture on <a href="%s">Gravatar</a>.' ) {
+			return __( 'You can change your profile picture on the <a href="%s">forum</a>.', 'flarum-bridge' );
+		}
+		if( $text == 'https://en.gravatar.com/' ) {
+			return trailingslashit( $this->db->getSettings()->flarum_url ).'u/'.$this->flarumUsername;
+		}
+		return $translation;
+	}
+
+	/**
 	 * @return null|string
 	 */
 	public function getAvatar( WP_User $user )
@@ -42,7 +76,9 @@ class Avatar
 		$flarumUserId = intval( get_user_meta( $user->ID, '_flarum_id', true ));
 		if( $flarumUserId ) {
 			$flarumUser = $this->api->getUser( $flarumUserId );
-			if( $flarumUser->avatarUrl ) {
+			if( !empty( $flarumUser->attributes['avatarUrl'] )) {
+				$this->flarumUsername = $flarumUser->username;
+				add_filter( 'gettext', [$this, 'filterGettext'], 10, 3 );
 				return $flarumUser->avatarUrl;
 			}
 		}

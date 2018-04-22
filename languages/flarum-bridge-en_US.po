@@ -18,15 +18,15 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "Language: qps-ploc\n"
 
-#: activate.php:124
+#: activate.php:132
 msgid "The %s plugin was deactivated."
 msgstr "The %s plugin was deactivated."
 
-#: activate.php:125
+#: activate.php:133
 msgid "Sorry, this plugin requires %s or greater in order to work properly."
 msgstr "Sorry, this plugin requires %s or greater in order to work properly."
 
-#: activate.php:126
+#: activate.php:134
 msgid ""
 "Please contact your hosting provider or server administrator to upgrade the "
 "version of PHP on your server (your server is running PHP version %s), or "
@@ -36,29 +36,33 @@ msgstr ""
 "version of PHP on your server (your server is running PHP version %s), or "
 "try to find an alternative plugin."
 
-#: activate.php:127
+#: activate.php:135
 msgid "PHP version"
 msgstr "PHP version"
 
-#: activate.php:128
+#: activate.php:136
 msgid "WordPress version"
 msgstr "WordPress version"
 
-#: activate.php:129
+#: activate.php:137
 msgid "Update WordPress"
 msgstr "Update WordPress"
 
-#: plugin/Application.php:110, plugin/Application.php:111
+#: plugin/Application.php:121, plugin/Application.php:122
 msgid "Flarum Bridge"
 msgstr "Flarum Bridge"
 
-#: plugin/Application.php:148
+#: plugin/Application.php:159
 msgid "Flarum Bridge Settings"
 msgstr "Flarum Bridge Settings"
 
-#: plugin/Application.php:162
+#: plugin/Application.php:173
 msgid "Please make sure the password is at least 8 characters."
 msgstr "Please make sure the password is at least 8 characters."
+
+#: plugin/Avatar.php:63
+msgid "You can change your profile picture on the <a href=\"%s\">forum</a>."
+msgstr "You can change your profile picture on the <a href=\"%s\">forum</a>."
 
 #: views/settings.php:11
 msgid "Flarum URL"
